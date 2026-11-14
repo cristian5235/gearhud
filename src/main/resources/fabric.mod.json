@@ -1,0 +1,20 @@
+{
+	"schemaVersion": 1,
+	"id": "gearhud",
+	"version": "${version}",
+	"name": "Gear & Effects HUD",
+	"description": "Customizable HUD showing armor and held item durability plus potion effect timers. Press K to drag and customize.",
+	"authors": ["Your Name"],
+	"license": "MIT",
+	"icon": "assets/gearhud/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": ["dev.gearhud.GearHudClient"]
+	},
+	"depends": {
+		"fabricloader": ">=0.18.1",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
