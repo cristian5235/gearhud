@@ -10,7 +10,7 @@ GET THE .JAR (pick one)
   B) On your PC: install Java 21 and Gradle, then run
         gradle wrapper --gradle-version 9.2.1
         ./gradlew build
-     The jar is build/libs/gearhud-1.0.0.jar  (NOT the -sources jar)
+     The jar is build/libs/gearhud-1.2.0.jar  (NOT the -sources jar)
 
 INSTALL
   Put the jar in .minecraft/mods together with Fabric API (Fabric Loader 0.18.1+).

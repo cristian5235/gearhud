@@ -23,6 +23,10 @@ public final class HudConfig {
 
 	public enum NumberMode { DURABILITY, PERCENT, OFF }
 
+	public enum BarMode { DAMAGED, ALWAYS, OFF }
+
+	public enum EffectStyle { TILES, LIST }
+
 	public static class PanelConfig {
 		public boolean enabled = true;
 		public float scale = 1.0f;
@@ -44,7 +48,10 @@ public final class HudConfig {
 	public static class ArmorConfig extends PanelConfig {
 		public boolean showMainHand = true;
 		public boolean showOffhand = true;
-		public boolean showBars = true;
+		/** DAMAGED = green bar only when the item has lost durability */
+		public BarMode bars = BarMode.DAMAGED;
+		/** Non-damageable items (food, blocks...) show the total amount in your whole inventory */
+		public boolean showTotalCount = true;
 		public boolean colorNumbers = false;
 		public NumberMode numbers = NumberMode.DURABILITY;
 
@@ -54,6 +61,10 @@ public final class HudConfig {
 	}
 
 	public static class EffectsConfig extends PanelConfig {
+		/** TILES = small square boxes with the icon and a short time (1m, 45s), LIST = icon + name + m:ss */
+		public EffectStyle style = EffectStyle.TILES;
+		public int tilesPerRow = 3;
+		public boolean showLevel = true;
 		public boolean showIcons = true;
 		public boolean showNames = true;
 		/** Timer turns red at or below this many seconds (0 = never) */

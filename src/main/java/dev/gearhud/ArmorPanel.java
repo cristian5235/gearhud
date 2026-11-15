@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -49,6 +50,28 @@ final class ArmorPanel extends HudPanel {
 		return sample;
 	}
 
+	/** Total of this item in the whole inventory (hotbar, backpack, offhand). */
+	private static int countInInventory(LocalPlayer player, ItemStack target) {
+		int total = 0;
+		Inventory inv = player.getInventory();
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			ItemStack s = inv.getItem(i);
+			if (ItemStack.isSameItemSameComponents(s, target)) {
+				total += s.getCount();
+			}
+		}
+		return Math.max(total, target.getCount());
+	}
+
+	private static boolean showBar(HudConfig.ArmorConfig c, ItemStack s) {
+		if (!s.isDamageableItem()) return false;
+		return switch (c.bars) {
+			case ALWAYS -> true;
+			case DAMAGED -> s.getDamageValue() > 0;
+			case OFF -> false;
+		};
+	}
+
 	@Override
 	boolean prepare(Minecraft mc, LocalPlayer player, boolean preview) {
 		HudConfig.ArmorConfig c = HudConfig.get().armor;
@@ -83,6 +106,8 @@ final class ArmorPanel extends HudPanel {
 							? Math.round(100f * left / s.getMaxDamage()) + "%"
 							: String.valueOf(left);
 					if (c.colorNumbers) color = 0xFF000000 | s.getBarColor();
+				} else if (c.showTotalCount && s.getMaxStackSize() > 1) {
+					text = String.valueOf(countInInventory(player, s));
 				} else if (s.getCount() > 1) {
 					text = String.valueOf(s.getCount());
 				}
@@ -113,7 +138,7 @@ final class ArmorPanel extends HudPanel {
 				g.drawString(mc.font, r.text(), tx, y + 4, r.color(), true);
 			}
 
-			if (c.showBars && s.isDamageableItem()) {
+			if (showBar(c, s)) {
 				int left = s.getMaxDamage() - s.getDamageValue();
 				int fill = Math.round(13f * left / s.getMaxDamage());
 				g.fill(iconX + 2, y + 16, iconX + 15, y + 18, 0xFF000000);

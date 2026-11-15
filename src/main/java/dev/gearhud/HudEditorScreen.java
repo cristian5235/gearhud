@@ -18,6 +18,7 @@ import net.minecraft.network.chat.Component;
 public class HudEditorScreen extends Screen {
 	private static final List<Float> SCALES = List.of(0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f);
 	private static final List<Integer> WARN_SECONDS = List.of(0, 5, 10, 20, 30);
+	private static final List<Integer> TILES_PER_ROW = List.of(2, 3, 4, 5, 6, 8);
 
 	private static final int COL_W = 150;
 	private static final int GAP = 10;
@@ -37,7 +38,7 @@ public class HudEditorScreen extends Screen {
 		HudConfig cfg = HudConfig.get();
 		leftX = this.width / 2 - GAP / 2 - COL_W;
 		rightX = this.width / 2 + GAP / 2;
-		topY = this.height / 2 - 80;
+		topY = this.height / 2 - 100;
 
 		// ----- Armor column -----
 		int y = topY;
@@ -47,7 +48,13 @@ public class HudEditorScreen extends Screen {
 		y += ROW_H;
 		addToggle(leftX, y, "Offhand item", () -> cfg.armor.showOffhand, v -> cfg.armor.showOffhand = v);
 		y += ROW_H;
-		addToggle(leftX, y, "Durability bars", () -> cfg.armor.showBars, v -> cfg.armor.showBars = v);
+		addCycle(leftX, y, List.of(HudConfig.BarMode.values()),
+				() -> cfg.armor.bars, v -> cfg.armor.bars = v,
+				v -> "Green bar: " + switch (v) {
+					case DAMAGED -> "when damaged";
+					case ALWAYS -> "always";
+					case OFF -> "off";
+				});
 		y += ROW_H;
 		addCycle(leftX, y, List.of(HudConfig.NumberMode.values()),
 				() -> cfg.armor.numbers, v -> cfg.armor.numbers = v,
@@ -59,15 +66,26 @@ public class HudEditorScreen extends Screen {
 		y += ROW_H;
 		addToggle(leftX, y, "Color numbers", () -> cfg.armor.colorNumbers, v -> cfg.armor.colorNumbers = v);
 		y += ROW_H;
+		addToggle(leftX, y, "Total item count", () -> cfg.armor.showTotalCount, v -> cfg.armor.showTotalCount = v);
+		y += ROW_H;
 		addCycle(leftX, y, SCALES, () -> cfg.armor.scale, v -> cfg.armor.scale = v, v -> "Scale: " + v + "x");
 
 		// ----- Effects column -----
 		y = topY;
 		addToggle(rightX, y, "Effect timers", () -> cfg.effects.enabled, v -> cfg.effects.enabled = v);
 		y += ROW_H;
-		addToggle(rightX, y, "Effect icons", () -> cfg.effects.showIcons, v -> cfg.effects.showIcons = v);
+		addCycle(rightX, y, List.of(HudConfig.EffectStyle.values()),
+				() -> cfg.effects.style, v -> cfg.effects.style = v,
+				v -> "Style: " + (v == HudConfig.EffectStyle.TILES ? "Tiles" : "List"));
 		y += ROW_H;
-		addToggle(rightX, y, "Effect names", () -> cfg.effects.showNames, v -> cfg.effects.showNames = v);
+		addCycle(rightX, y, TILES_PER_ROW, () -> cfg.effects.tilesPerRow, v -> cfg.effects.tilesPerRow = v,
+				v -> "Tiles per row: " + v);
+		y += ROW_H;
+		addToggle(rightX, y, "Tiles: level", () -> cfg.effects.showLevel, v -> cfg.effects.showLevel = v);
+		y += ROW_H;
+		addToggle(rightX, y, "List: icons", () -> cfg.effects.showIcons, v -> cfg.effects.showIcons = v);
+		y += ROW_H;
+		addToggle(rightX, y, "List: names", () -> cfg.effects.showNames, v -> cfg.effects.showNames = v);
 		y += ROW_H;
 		addCycle(rightX, y, WARN_SECONDS, () -> cfg.effects.warnSeconds, v -> cfg.effects.warnSeconds = v,
 				v -> "Red timer: " + (v == 0 ? "never" : "under " + v + "s"));
@@ -75,7 +93,7 @@ public class HudEditorScreen extends Screen {
 		addCycle(rightX, y, SCALES, () -> cfg.effects.scale, v -> cfg.effects.scale = v, v -> "Scale: " + v + "x");
 
 		// ----- Bottom buttons -----
-		int by = topY + 7 * ROW_H + 6;
+		int by = topY + 8 * ROW_H + 6;
 		addRenderableWidget(Button.builder(Component.literal("Reset positions"), b -> cfg.resetPositions())
 				.bounds(leftX, by, COL_W, 20).build());
 		addRenderableWidget(Button.builder(Component.literal("Done"), b -> this.onClose())
